@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BranchFit | Intelligent Branch Guidance</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+    <div class="login-panel">
+        <h2>Welcome Back</h2>
+        <p>Please login to continue</p>
+
+       <form method="POST" action="/">
+
+    <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" required>
+    </div>
+
+    <button type="submit">Sign In</button>
+    <div class="alt-link">
+        <p>New to BranchFit?
+            <a href="{{ url_for('register') }}">Create an account</a>
+        </p>
+    </div>
+
+</form>
+
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BranchFit | Student Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>BranchFit</h2>
+        <ul>
+            <li class="active">Dashboard</li>
+            <li>Profile</li>
+            <li>Aptitude Test</li>
+            <li>Results</li>
+            <li>Logout</li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h1>Welcome, Student</h1>
+        <p class="subtitle">
+            Start your branch selection journey
+        </p>
+
+        <div class="card-grid">
+
+            <div class="card">
+                <h3>Complete Profile</h3>
+                <p>Fill in your academic and interest details.</p>
+                <button>Go to Profile</button>
+            </div>
+
+            <div class="card">
+                <h3>Take Aptitude Test</h3>
+                <p>Answer structured questions for evaluation.</p>
+                <button>Start Test</button>
+            </div>
+
+            <div class="card">
+                <h3>View Recommendation</h3>
+                <p>Check your suggested engineering branch.</p>
+                <button>View Result</button>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
