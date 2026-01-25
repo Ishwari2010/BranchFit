@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>BranchFit | Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="page-wrapper single">
+    <div class="login-panel">
+        <h2>Student Profile</h2>
+        <p>Complete your profile to receive accurate recommendations</p>
+
+        <form method="POST" action="/profile">
+
+            <div class="form-group">
+                <label>Highest Education</label>
+                <select name="education" required>
+                    <option value="">Select</option>
+                    <option>10th Pass</option>
+                    <option>12th Science</option>
+                    <option>Diploma</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Interests</label>
+                <input type="text" name="interests"
+                       placeholder="e.g. Programming, Electronics, Design"
+                       required>
+            </div>
+
+            <button type="submit">Save Profile</button>
+
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

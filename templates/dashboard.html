@@ -23,7 +23,7 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <h1>Welcome, Student</h1>
+        <h1>Welcome, {{ user_name }}</h1>
         <p class="subtitle">
             Start your branch selection journey
         </p>
@@ -33,7 +33,10 @@
             <div class="card">
                 <h3>Complete Profile</h3>
                 <p>Fill in your academic and interest details.</p>
-                <button>Go to Profile</button>
+                <a href="{{ url_for('profile') }}">
+                    <button>Go to Profile</button>
+                </a>
+
             </div>
 
             <div class="card">
