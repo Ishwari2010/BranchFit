@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ branch }} Branch Aptitude Test</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .test-wrapper {
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .test-card {
+            background: white;
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .test-card h2 {
+            color: #1f3c88;
+            margin-bottom: 10px;
+        }
+
+        .test-card p {
+            margin-bottom: 25px;
+            color: #555;
+        }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .options {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+            max-width: 400px;
+            margin-top: 10px;
+        }
+
+        .options label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            margin-top: 30px;
+            padding: 12px 20px;
+            background: linear-gradient(120deg, #1f3c88, #2c6bed);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="test-wrapper">
+    <div class="test-card">
+
+        <h2>{{ branch }} Branch Aptitude Test</h2>
+        <p>Please respond to each statement (1 = Strongly Disagree, 2 = Agree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree)</p>
+
+        <form method="POST">
+            {% for q in questions %}
+            <div class="question-block">
+                <div class="question-text">
+                    {{ loop.index }}. {{ q.text }}
+                </div>
+
+                <div class="options">
+                    <label>
+                        1
+                        <input type="radio" name="q{{ q.question_id }}" value="1" required>
+                    </label>
+                    <label>
+                        2
+                        <input type="radio" name="q{{ q.question_id }}" value="2">
+                    </label>
+                    <label>
+                        3
+                        <input type="radio" name="q{{ q.question_id }}" value="3">
+                    </label>
+                    <label>
+                        4
+                        <input type="radio" name="q{{ q.question_id }}" value="4">
+                    </label>
+                    <label>
+                        5
+                        <input type="radio" name="q{{ q.question_id }}" value="5">
+                    </label>
+                </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="submit-btn">Submit Test</button>
+        </form>
+
+    </div>
+</div>
+
+</body>
+</html>

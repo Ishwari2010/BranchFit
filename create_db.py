@@ -1,14 +1,22 @@
-import sqlite3
-import os
+from app import app
+from extensions import db
+from models.user import User
+from werkzeug.security import generate_password_hash
 
-os.makedirs("database", exist_ok=True)
+# Create all tables
+with app.app_context():
+    db.create_all()
 
-conn = sqlite3.connect("database/system.db")
-
-with open("database/schema.sql", "r") as f:
-    conn.executescript(f.read())
-
-conn.commit()
-conn.close()
+    # Create admin if not exists
+    if not User.query.filter_by(email="admin@branchfit.com").first():
+        admin = User(
+            name="System Admin",
+            email="admin@branchfit.com",
+            password=generate_password_hash("admin123"),
+            role="admin",
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin created successfully")
 
 print("Database created successfully")

@@ -4,45 +4,99 @@
     <meta charset="UTF-8">
     <title>Question Bank | Admin</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-container {
+            width: 80%;
+            margin: auto;
+            margin-top: 40px;
+        }
+
+        .admin-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        h2 { color: #1f3c88; }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: linear-gradient(120deg, #1f3c88, #2c6bed);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th { background: #f4f6fb; }
+    </style>
 </head>
 <body>
 
-<div class="page-wrapper single">
-    <div class="login-panel">
+<div class="admin-container">
+
+    <!-- ADD QUESTION -->
+    <div class="admin-card">
         <h2>Add Aptitude Question</h2>
 
         <form method="POST">
+            <label>Question Text</label>
+            <input type="text" name="question" placeholder="Enter aptitude question..." required>
 
-    <div class="form-group">
-        <label>Question</label>
-        <input type="text" name="question" required>
+            <p><b>Note:</b> All questions use the standard scale:<br>
+            1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree</p>
+
+            <button type="submit">Add Question</button>
+        </form>
+        <a href="{{ url_for('admin_dashboard') }}">
+            <button type="button" style="margin-top:15px;">Done</button>
+        </a>
     </div>
 
-    <div class="form-group">
-        <label>Option A</label>
-        <input type="text" name="option_a" required>
+    <!-- EXISTING QUESTIONS -->
+    <div class="admin-card">
+        <h2>Existing Aptitude Questions</h2>
+
+        {% if questions %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Question</th>
+            </tr>
+            {% for q in questions %}
+            <tr>
+                <td>{{ q.question_id }}</td>
+                <td>{{ q.text }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p>No aptitude questions added yet.</p>
+        {% endif %}
     </div>
 
-    <div class="form-group">
-        <label>Option B</label>
-        <input type="text" name="option_b" required>
-    </div>
-
-    <div class="form-group">
-        <label>Option C</label>
-        <input type="text" name="option_c" required>
-    </div>
-
-    <div class="form-group">
-        <label>Option D</label>
-        <input type="text" name="option_d" required>
-    </div>
-
-    <button type="submit">Add Question</button>
-
-</form>
-
-    </div>
 </div>
 
 </body>

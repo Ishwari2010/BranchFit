@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Branch Question Manager</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .admin-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .admin-container {
+            width: 80%;
+            margin: auto;
+            margin-top: 40px;
+        }
+        h2 { color: #1f3c88; }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0 15px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th { background: #f4f6fb; }
+        button {
+            background: linear-gradient(120deg, #1f3c88, #2c6bed);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-container">
+
+    <div class="admin-card">
+        <h2>Add Branch MCQ Question</h2>
+
+        <h2>Add Branch Psychometric Question</h2>
+
+        <form method="POST">
+            <label>Branch</label>
+            <select name="branch" required>
+                <option value="CS">Computer Science</option>
+                <option value="IT">Information Technology</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="Electrical">Electrical</option>
+                <option value="EXTC">EXTC</option>
+            </select>
+
+            <label>Question Statement</label>
+            <textarea name="text" rows="3" required></textarea>
+
+            <label>Scale 1 Label (Lowest Agreement)</label>
+            <input type="text" name="scale_1_label" value="Strongly Disagree">
+
+            <label>Scale 2 Label</label>
+            <input type="text" name="scale_2_label" value="Disagree">
+
+            <label>Scale 3 Label (Neutral)</label>
+            <input type="text" name="scale_3_label" value="Neutral">
+
+            <label>Scale 4 Label</label>
+            <input type="text" name="scale_4_label" value="Agree">
+
+            <label>Scale 5 Label (Highest Agreement)</label>
+            <input type="text" name="scale_5_label" value="Strongly Agree">
+
+            <button type="submit">Add Question</button>
+        </form>
+
+    </div>
+
+    <div class="admin-card">
+        <h2>Existing Questions</h2>
+
+        {% if questions %}
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Branch</th>
+                <th>Question</th>
+                <th>Scale 1</th>
+                <th>Scale 5</th>
+                <th>Actions</th>
+            </tr>
+            {% for q in questions %}
+            <tr>
+                <td>{{ q.question_id }}</td>
+                <td>{{ q.branch }}</td>
+                <td>{{ q.text }}</td>
+                <td>{{ q.scale_1_label }}</td>
+                <td>{{ q.scale_5_label }}</td>
+                <td>
+                    <a href="{{ url_for('delete_branch_question', id=q.question_id) }}">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% else %}
+            <p>No branch questions added yet.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+</body>
+</html>

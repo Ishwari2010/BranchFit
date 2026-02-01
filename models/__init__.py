@@ -5,3 +5,4 @@ from .answer import Answer
 from .branch import Branch
 from .branch_weight import BranchWeight
 from .result import Result
+from .branch_question import BranchQuestion

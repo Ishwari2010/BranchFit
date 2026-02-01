@@ -1,5 +1,6 @@
 from extensions import db
 
+
 class Result(db.Model):
     __tablename__ = "results"
 

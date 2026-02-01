@@ -4,6 +4,8 @@ from extensions import db
 from flask import session
 from models.student_profile import StudentProfile
 from models.question import Question
+from models.branch_question import BranchQuestion
+from models.user import User
 
 
 import os
@@ -19,8 +21,6 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 
-# IMPORT MODELS AFTER db INIT
-from models.user import User
 
 @app.route("/", methods=["GET", "POST"])
 def login():
@@ -83,6 +83,7 @@ def register():
         db.session.commit()
         session["user_id"] = user.user_id
         session["user_name"] = user.name
+        session["role"] = user.role
 
 
         return redirect(url_for("dashboard"))
@@ -145,19 +146,13 @@ def manage_questions():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        q = Question(
-            text=request.form["question"],
-            option_a=request.form["option_a"],
-            option_b=request.form["option_b"],
-            option_c=request.form["option_c"],
-            option_d=request.form["option_d"]
-        )
+        q = Question(text=request.form["question"])
         db.session.add(q)
         db.session.commit()
 
-
     questions = Question.query.all()
     return render_template("manage_questions.html", questions=questions)
+
 
 @app.route("/logout")
 def logout():
@@ -165,8 +160,109 @@ def logout():
     return redirect(url_for("login"))
 
 
+@app.route("/admin/branch-questions", methods=["GET", "POST"])
+def manage_branch_questions():
+    if "user_id" not in session or session.get("role") != "admin":
+        return redirect(url_for("login"))
+
+
+    if request.method == "POST":
+        branch = request.form["branch"]
+        text = request.form["text"]
+
+        new_question = BranchQuestion(
+            branch=branch,
+            text=text,
+            scale_1_label=request.form["scale_1_label"],
+            scale_2_label=request.form["scale_2_label"],
+            scale_3_label=request.form["scale_3_label"],
+            scale_4_label=request.form["scale_4_label"],
+            scale_5_label=request.form["scale_5_label"],
+        )
+
+        db.session.add(new_question)
+        db.session.commit()
+
+        return redirect(url_for("manage_branch_questions"))
+
+    questions = BranchQuestion.query.all()
+    return render_template("admin_branch_questions.html", questions=questions)
+        
+        
+
+
+@app.route("/admin/branch-question/edit/<int:id>", methods=["GET", "POST"])
+def edit_branch_question(id):
+    if session.get("role") != "admin":
+        return redirect(url_for("login"))
+
+    question = BranchQuestion.query.get_or_404(id)
+
+    if request.method == "POST":
+        question.branch = request.form["branch"]
+        question.text = request.form["text"]
+        db.session.commit()
+        return redirect(url_for("manage_branch_questions"))
+
+    return render_template("edit_branch_question.html", question=question)
+
+@app.route("/admin/branch-question/delete/<int:id>")
+def delete_branch_question(id):
+    if session.get("role") != "admin":
+        return redirect(url_for("login"))
+
+    question = BranchQuestion.query.get_or_404(id)
+    db.session.delete(question)
+    db.session.commit()
+    return redirect(url_for("manage_branch_questions"))
+
+@app.route("/branch-test/cs", methods=["GET", "POST"])
+def cs_branch_test():
+    if session.get("role") != "student":
+        return redirect(url_for("login"))
+
+    questions = BranchQuestion.query.filter_by(branch="CS").all()
+
+    if request.method == "POST":
+        total_score = 0
+
+        for q in questions:
+            score = int(request.form.get(f"q{q.question_id}"))
+            total_score += score
+
+        avg_score = total_score / len(questions)
+        cs_test_percent = (avg_score / 5) * 100
+
+        session["cs_test_percent"] = cs_test_percent
+        return redirect(url_for("cs_test_result"))
+
+    return render_template("branch_test.html", questions=questions, branch="CS")
+
+@app.route("/branch-test/cs/result")
+def cs_test_result():
+    if session.get("role") != "student":
+        return redirect(url_for("login"))
+
+    test_percent = session.get("cs_test_percent")
+
+    if test_percent >= 70:
+        result = "Strong Aptitude – You show strong suitability for Computer Science."
+    elif test_percent >= 50:
+        result = "Moderate Aptitude – You can pursue CS with effort."
+    else:
+        result = "Low Aptitude – CS may not strongly align with your strengths."
+
+    return render_template("branch_result.html",
+                           test_percent=test_percent,
+                           affinity_percent=None,
+                           result=result)
+
+
+
 
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
+    

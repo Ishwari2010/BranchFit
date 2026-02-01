@@ -1,5 +1,6 @@
 from extensions import db
 
+
 class BranchWeight(db.Model):
     __tablename__ = "branch_weights"
 

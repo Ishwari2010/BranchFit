@@ -14,6 +14,7 @@
         <ul>
             <li class="active">Dashboard</li>
             <li><a href="{{ url_for('manage_questions') }}">Question Bank</a></li>
+            <li><a href="{{ url_for('manage_branch_questions') }}">Branch Test Questions</a></li>
             <li><a href="{{ url_for('logout') }}">Logout</a></li>
         </ul>
     </div>
@@ -31,6 +32,15 @@
                     <button>Open Question Bank</button>
                 </a>
             </div>
+
+            <div class="card">
+                <h3>Manage Branch Tests</h3>
+                <p>Add, edit, and delete branch-specific aptitude questions.</p>
+                <a href="{{ url_for('manage_branch_questions') }}">
+                    <button>Open Branch Question Manager</button>
+                </a>
+            </div>
+
 
         </div>
     </div>

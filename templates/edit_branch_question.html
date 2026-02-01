@@ -1,0 +1,16 @@
+<h2>Edit Question</h2>
+<form method="POST">
+    <select name="branch">
+        <option value="CS" {% if question.branch=="CS" %}selected{% endif %}>CS</option>
+        <option value="Mechanical" {% if question.branch=="Mechanical" %}selected{% endif %}>Mechanical</option>
+        <option value="Electrical" {% if question.branch=="Electrical" %}selected{% endif %}>Electrical</option>
+        <option value="EXTC" {% if question.branch=="EXTC" %}selected{% endif %}>EXTC</option>
+        <option value="IT" {% if question.branch=="IT" %}selected{% endif %}>IT</option>
+    </select>
+    <br><br>
+
+    <textarea name="text">{{ question.text }}</textarea>
+    <br><br>
+
+    <button type="submit">Update</button>
+</form>

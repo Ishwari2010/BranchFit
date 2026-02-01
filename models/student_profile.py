@@ -1,5 +1,6 @@
 from extensions import db
 
+
 class StudentProfile(db.Model):
     __tablename__ = "student_profile"
 
