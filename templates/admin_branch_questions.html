@@ -52,16 +52,15 @@
     <div class="admin-card">
         <h2>Add Branch MCQ Question</h2>
 
-        <h2>Add Branch Psychometric Question</h2>
+        <form method="POST" action="{{ url_for('manage_branch_questions', branch=selected_branch) }}">
 
-        <form method="POST">
             <label>Branch</label>
-            <select name="branch" required>
-                <option value="CS">Computer Science</option>
-                <option value="IT">Information Technology</option>
-                <option value="Mechanical">Mechanical</option>
-                <option value="Electrical">Electrical</option>
-                <option value="EXTC">EXTC</option>
+            <select name="branch" onchange="window.location.href='?branch=' + this.value">
+                <option value="CS" {% if selected_branch == "CS" %}selected{% endif %}>Computer Science</option>
+                <option value="IT" {% if selected_branch == "IT" %}selected{% endif %}>Information Technology</option>
+                <option value="Mechanical" {% if selected_branch == "Mechanical" %}selected{% endif %}>Mechanical</option>
+                <option value="Electrical" {% if selected_branch == "Electrical" %}selected{% endif %}>Electrical</option>
+                <option value="EXTC" {% if selected_branch == "EXTC" %}selected{% endif %}>EXTC</option>
             </select>
 
             <label>Question Statement</label>
@@ -84,8 +83,11 @@
 
             <button type="submit">Add Question</button>
         </form>
+        <div style="margin-top:15px;">
+            <a href="{{ url_for('admin_dashboard') }}" class="secondary-btn">← Back to Dashboard</a>
+        </div>
 
-    </div>
+   </div>
 
     <div class="admin-card">
         <h2>Existing Questions</h2>
@@ -102,13 +104,13 @@
             </tr>
             {% for q in questions %}
             <tr>
-                <td>{{ q.question_id }}</td>
+                <td>{{ loop.index }}</td>
                 <td>{{ q.branch }}</td>
                 <td>{{ q.text }}</td>
                 <td>{{ q.scale_1_label }}</td>
                 <td>{{ q.scale_5_label }}</td>
                 <td>
-                    <a href="{{ url_for('delete_branch_question', id=q.question_id) }}">Delete</a>
+                    <a href="{{ url_for('delete_branch_question', id=q.question_id, branch=selected_branch) }}">Delete</a>
                 </td>
             </tr>
             {% endfor %}

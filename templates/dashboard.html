@@ -49,10 +49,22 @@
 
             <!-- CARD 4 -->
             <div class="card">
-                <h3>Computer Science Branch Test</h3>
-                <p>Check if CS is the right fit for you.</p>
-                <a href="{{ url_for('cs_branch_test') }}"><button>Take CS Test</button></a>
-            </div>
+    <h3>Branch Aptitude Test</h3>
+    <p>Select a branch and take its specific aptitude test.</p>
+
+    <form method="GET" action="" onsubmit="return goToBranchTest();">
+        <select id="branchSelect" required>
+            <option value="">-- Select Branch --</option>
+            <option value="cs">Computer Science</option>
+            <option value="it">Information Technology</option>
+            <option value="mechanical">Mechanical</option>
+            <option value="electrical">Electrical</option>
+            <option value="extc">EXTC</option>
+        </select>
+
+        <button type="submit" style="margin-top:10px;">Start Branch Test</button>
+    </form>
+</div>
 
         </div>
     </div>
@@ -61,6 +73,42 @@
 
 
 </div>
+
+<script>
+function goToBranchTest() {
+    const branch = document.getElementById("branchSelect").value;
+    if (!branch) return false;
+
+    const routes = {
+        "cs": "/branch-test/cs",
+        "it": "/branch-test/it",
+        "mechanical": "/branch-test/mechanical",
+        "electrical": "/branch-test/electrical",
+        "extc": "/branch-test/extc"
+    };
+
+    window.location.href = routes[branch];
+    return false;
+}
+</script>
+<script>
+function goToBranchTest() {
+    const branch = document.getElementById("branchSelect").value;
+    if (!branch) return false;
+
+    const routes = {
+        "cs": "/branch-test/cs",
+        "it": "/branch-test/it",
+        "mechanical": "/branch-test/mechanical",
+        "electrical": "/branch-test/electrical",
+        "extc": "/branch-test/extc"
+    };
+
+    window.location.href = routes[branch];
+    return false;
+}
+</script>
+
 
 </body>
 </html>

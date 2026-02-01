@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 from flask import session
+from models import branch
 from models.student_profile import StudentProfile
 from models.question import Question
 from models.branch_question import BranchQuestion
@@ -183,10 +184,21 @@ def manage_branch_questions():
         db.session.add(new_question)
         db.session.commit()
 
-        return redirect(url_for("manage_branch_questions"))
+        return redirect(url_for("manage_branch_questions", branch=branch))
 
-    questions = BranchQuestion.query.all()
-    return render_template("admin_branch_questions.html", questions=questions)
+
+        # Get selected branch from URL (default = CS)
+    selected_branch = request.args.get("branch", "CS")
+
+    # Show only questions of that branch
+    questions = BranchQuestion.query.filter_by(branch=selected_branch).all()
+
+    return render_template(
+        "admin_branch_questions.html",
+        questions=questions,
+        selected_branch=selected_branch
+    )
+
         
         
 
@@ -201,20 +213,34 @@ def edit_branch_question(id):
     if request.method == "POST":
         question.branch = request.form["branch"]
         question.text = request.form["text"]
+        question.scale_1_label = request.form["scale_1_label"]
+        question.scale_2_label = request.form["scale_2_label"]
+        question.scale_3_label = request.form["scale_3_label"]
+        question.scale_4_label = request.form["scale_4_label"]
+        question.scale_5_label = request.form["scale_5_label"]
+
         db.session.commit()
-        return redirect(url_for("manage_branch_questions"))
+
+        # 🔥 Get branch from form (correct)
+        branch = request.form["branch"]
+        return redirect(url_for("manage_branch_questions", branch=branch))
 
     return render_template("edit_branch_question.html", question=question)
+
 
 @app.route("/admin/branch-question/delete/<int:id>")
 def delete_branch_question(id):
     if session.get("role") != "admin":
         return redirect(url_for("login"))
 
-    question = BranchQuestion.query.get_or_404(id)
-    db.session.delete(question)
+    branch = request.args.get("branch")  # keep current branch in URL
+
+    question = BranchQuestion.query.get_or_404(id)  # get ONLY this question
+    db.session.delete(question)  # delete only this row
     db.session.commit()
-    return redirect(url_for("manage_branch_questions"))
+
+    return redirect(url_for("manage_branch_questions", branch=branch))
+
 
 @app.route("/branch-test/cs", methods=["GET", "POST"])
 def cs_branch_test():
@@ -257,6 +283,36 @@ def cs_test_result():
                            affinity_percent=None,
                            result=result)
 
+@app.route("/branch-test/it", methods=["GET", "POST"])
+def it_branch_test():
+    if session.get("role") != "student":
+        return redirect(url_for("login"))
+
+    questions = BranchQuestion.query.filter_by(branch="IT").all()
+
+    if request.method == "POST":
+        total_score = sum(int(request.form.get(f"q{q.question_id}", 0)) for q in questions)
+        avg_score = total_score / len(questions)
+        percent = (avg_score / 5) * 100
+        session["it_test_percent"] = percent
+        return redirect(url_for("it_test_result"))
+
+    return render_template("branch_test.html", questions=questions, branch="IT")
+
+@app.route("/branch-test/it/result")
+def it_test_result():
+    percent = session.get("it_test_percent", 0)
+
+    if percent >= 70:
+        result = "Strong Aptitude for IT."
+    elif percent >= 50:
+        result = "Moderate Aptitude for IT."
+    else:
+        result = "Low Aptitude for IT."
+
+    return render_template("branch_result.html",
+                           test_percent=percent,
+                           result=result)
 
 
 
