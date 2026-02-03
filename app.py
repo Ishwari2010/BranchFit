@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+import flask
 from werkzeug.security import generate_password_hash, check_password_hash
 from extensions import db
 from flask import session
@@ -7,9 +8,10 @@ from models.student_profile import StudentProfile
 from models.question import Question
 from models.branch_question import BranchQuestion
 from models.user import User
-
+from models.aptitude_question import AptitudeQuestion
 
 import os
+
 
 app = Flask(__name__)
 app.secret_key = "branchfit_secret"
@@ -147,12 +149,22 @@ def manage_questions():
         return redirect(url_for("login"))
 
     if request.method == "POST":
-        q = Question(text=request.form["question"])
-        db.session.add(q)
+        question_text = request.form["question_text"]
+        question_index = request.form["question_index"]
+
+        new_question = AptitudeQuestion(
+            question_text=question_text,
+            question_index=question_index
+        )
+
+        db.session.add(new_question)
         db.session.commit()
 
-    questions = Question.query.all()
+        return redirect(url_for("manage_questions"))
+
+    questions = AptitudeQuestion.query.order_by(AptitudeQuestion.question_index).all()
     return render_template("manage_questions.html", questions=questions)
+
 
 
 @app.route("/logout")
@@ -314,6 +326,58 @@ def it_test_result():
                            test_percent=percent,
                            result=result)
 
+
+
+from flask import session
+
+@app.route('/common_test', methods=['GET', 'POST'])
+def common_test():
+    if "user_id" not in session or session.get("role") != "student":
+        return redirect(url_for("login"))
+
+    # FIRST VISIT → show 10 random ML questions
+    if request.method == "GET":
+        questions = AptitudeQuestion.query.order_by(db.func.random()).limit(10).all()
+        return render_template("branch_test.html", questions=questions, test_type="adaptive")
+
+    # FORM SUBMITTED → collect answers
+    answers = request.form.to_dict()
+
+    # Build feature vector (default neutral = 3)
+    feature_vector = [3] * 60
+
+    for q_name, value in answers.items():
+        q_id = int(q_name.replace("q", ""))
+        question = AptitudeQuestion.query.get(q_id)
+        if question:
+            feature_vector[question.question_index] = int(value)
+
+    prediction = model.predict([feature_vector])[0]
+
+    return render_template("branch_result.html", prediction=prediction)
+
+
+
+
+
+import joblib
+import os
+
+MODEL_PATH = os.path.join(BASE_DIR, "branch_predictor_model.pkl")
+model = joblib.load(MODEL_PATH)
+
+
+def predict_branch(answer_dict):
+    feature_vector = [3] * 60  # Default neutral answers
+
+    for q_name, value in answer_dict.items():
+        q_id = q_name.replace('q', '')
+        question = Question.query.get(q_id)
+
+        if question:
+            feature_vector[question.question_index] = int(value)
+
+    return model.predict([feature_vector])[0]
 
 
 if __name__ == "__main__":

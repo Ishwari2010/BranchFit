@@ -50,3 +50,11 @@ CREATE TABLE results (
     score REAL,
     FOREIGN KEY(user_id) REFERENCES users(user_id)
 );
+
+CREATE TABLE branch_questions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    question_text TEXT NOT NULL,
+    category TEXT NOT NULL,
+    question_index INTEGER UNIQUE NOT NULL
+);
+

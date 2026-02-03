@@ -78,35 +78,35 @@
     <div class="test-card">
 
         <h2>{{ branch }} Branch Aptitude Test</h2>
-        <p>Please respond to each statement (1 = Strongly Disagree, 2 = Agree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree)</p>
+        <p>Please respond to each statement (1 = Strongly Disagree, 2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree)</p>
 
         <form method="POST">
             {% for q in questions %}
             <div class="question-block">
                 <div class="question-text">
-                    {{ loop.index }}. {{ q.text }}
+                    {{ loop.index }}. {{ q.question_text }}
                 </div>
 
                 <div class="options">
                     <label>
                         1
-                        <input type="radio" name="q{{ q.question_id }}" value="1" required>
+                        <input type="radio" name="q{{ q.id or q.question_id }}" value="1" required>
                     </label>
                     <label>
                         2
-                        <input type="radio" name="q{{ q.question_id }}" value="2">
+                        <input type="radio" name="q{{ q.id or q.question_id }}" value="2">
                     </label>
                     <label>
                         3
-                        <input type="radio" name="q{{ q.question_id }}" value="3">
+                        <input type="radio" name="q{{ q.id or q.question_id }}" value="3">
                     </label>
                     <label>
                         4
-                        <input type="radio" name="q{{ q.question_id }}" value="4">
+                        <input type="radio" name="q{{ q.id or q.question_id }}" value="4">
                     </label>
                     <label>
                         5
-                        <input type="radio" name="q{{ q.question_id }}" value="5">
+                        <input type="radio" name="q{{ q.id or q.question_id }}" value="5">
                     </label>
                 </div>
             </div>

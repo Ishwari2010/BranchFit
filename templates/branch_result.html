@@ -58,8 +58,20 @@
 </head>
 <body>
 
-<div class="result-wrapper">
-    <div class="result-card">
+<div class="result-card">
+
+    {% if prediction %}
+        <h1>Recommended Branch</h1>
+
+        <div class="score">
+            {{ prediction }}
+        </div>
+
+        <div class="result-text">
+            Based on your responses, this branch best matches your aptitude and interests.
+        </div>
+
+    {% else %}
         <h1>CS Branch Suitability Result</h1>
 
         <div class="score">
@@ -69,11 +81,13 @@
         <div class="result-text">
             {{ result }}
         </div>
+    {% endif %}
 
-        <a href="{{ url_for('dashboard') }}" class="btn-dashboard">
-            Back to Dashboard
-        </a>
-    </div>
+    <a href="{{ url_for('dashboard') }}" class="btn-dashboard">
+        Back to Dashboard
+    </a>
+</div>
+
 </div>
 
 </body>
