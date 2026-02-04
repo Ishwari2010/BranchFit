@@ -10,5 +10,12 @@ class User(db.Model):
     password = db.Column(db.String(200), nullable=False)
     role = db.Column(db.String(20), nullable=False)
 
+    # NEW PROFILE FIELDS
+    phone = db.Column(db.String(15))
+    dob = db.Column(db.Date)
+    gender = db.Column(db.String(20))
+    bio = db.Column(db.Text)
+    profile_image = db.Column(db.String(200))  # store image filename
+
     def __repr__(self):
         return f"<User {self.email}>"

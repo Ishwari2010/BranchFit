@@ -84,29 +84,31 @@
             {% for q in questions %}
             <div class="question-block">
                 <div class="question-text">
-                    {{ loop.index }}. {{ q.question_text }}
+                    {{ session.current_index + 1 }}. {{ q.text }}
+
+
                 </div>
 
                 <div class="options">
                     <label>
                         1
-                        <input type="radio" name="q{{ q.id or q.question_id }}" value="1" required>
+                        <input type="radio" name="q{{ q.question_id }}" value="1" required>
                     </label>
                     <label>
                         2
-                        <input type="radio" name="q{{ q.id or q.question_id }}" value="2">
+                        <input type="radio" name="q{{ q.question_id }}" value="2">
                     </label>
                     <label>
                         3
-                        <input type="radio" name="q{{ q.id or q.question_id }}" value="3">
+                        <input type="radio" name="q{{ q.question_id }}" value="3">
                     </label>
                     <label>
                         4
-                        <input type="radio" name="q{{ q.id or q.question_id }}" value="4">
+                        <input type="radio" name="q{{ q.question_id }}" value="4">
                     </label>
                     <label>
                         5
-                        <input type="radio" name="q{{ q.id or q.question_id }}" value="5">
+                        <input type="radio" name="q{{ q.question_id }}" value="5">
                     </label>
                 </div>
             </div>

@@ -4,6 +4,43 @@
     <meta charset="UTF-8">
     <title>BranchFit | Profile</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <style>
+        .profile-pic-section {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .profile-pic-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        .profile-pic {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #2c6bed;
+        }
+
+        .edit-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background: #2c6bed;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            border: 2px solid white;
+        }
+    </style>
 </head>
 <body>
 
@@ -12,27 +49,35 @@
         <h2>Student Profile</h2>
         <p>Complete your profile to receive accurate recommendations</p>
 
-        <form method="POST" action="/profile">
+        <form method="POST" enctype="multipart/form-data">
 
-            <div class="form-group">
-                <label>Highest Education</label>
-                <select name="education" required>
-                    <option value="">Select</option>
-                    <option>10th Pass</option>
-                    <option>12th Science</option>
-                    <option>Diploma</option>
-                </select>
+            <div class="profile-pic-section">
+                <label for="profile_image_input" class="profile-pic-wrapper">
+                    <img src="{{ url_for('static', filename=user.profile_image) if user.profile_image else url_for('static', filename='images/default-avatar.png') }}" 
+                         alt="Profile Picture" class="profile-pic">
+                    <div class="edit-overlay">✏️</div>
+                </label>
+                <input type="file" name="profile_image" id="profile_image_input" hidden>
             </div>
 
-            <div class="form-group">
-                <label>Interests</label>
-                <input type="text" name="interests"
-                       placeholder="e.g. Programming, Electronics, Design"
-                       required>
-            </div>
+            <label>Phone Number</label>
+            <input type="text" name="phone" value="{{ user.phone or '' }}">
 
-            <button type="submit">Save Profile</button>
+            <label>Date of Birth</label>
+            <input type="date" name="dob" value="{{ user.dob or '' }}">
 
+            <label>Gender</label>
+            <select name="gender">
+                <option value="">Select</option>
+                <option value="Male" {% if user.gender=='Male' %}selected{% endif %}>Male</option>
+                <option value="Female" {% if user.gender=='Female' %}selected{% endif %}>Female</option>
+                <option value="Prefer not to say" {% if user.gender=='Prefer not to say' %}selected{% endif %}>Prefer not to say</option>
+            </select>
+
+            <label>Short Bio</label>
+            <textarea name="bio">{{ user.bio or '' }}</textarea>
+
+            <button type="submit" class="btn">Save Profile</button>
         </form>
     </div>
 </div>

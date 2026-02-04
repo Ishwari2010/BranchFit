@@ -10,16 +10,22 @@ from models.branch_question import BranchQuestion
 from models.user import User
 from models.aptitude_question import AptitudeQuestion
 
+import joblib
 import os
+
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "branch_predictor_model.pkl")
+
+model = joblib.load(MODEL_PATH)
+
+
+
 
 
 app = Flask(__name__)
 app.secret_key = "branchfit_secret"
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "system.db")
-
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + DB_PATH
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres.frifsubjsxdfflflpaap:Ishwarishinde@aws-1-ap-northeast-2.pooler.supabase.com:5432/postgres"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
@@ -104,44 +110,37 @@ def dashboard():
         user_name=session["user_name"]
     )
 
+import os
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = "static/uploads"
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "user_id" not in session:
         return redirect(url_for("login"))
 
+    user = User.query.get(session["user_id"])
+
     if request.method == "POST":
-        education = request.form["education"]
-        interests = request.form["interests"]
+        user.phone = request.form.get("phone")
+        user.bio = request.form.get("bio")
 
-        existing_profile = StudentProfile.query.filter_by(
-            user_id=session["user_id"]
-        ).first()
-
-        if existing_profile:
-            existing_profile.education = education
-            existing_profile.interests = interests
-        else:
-            profile = StudentProfile(
-                user_id=session["user_id"],
-                education=education,
-                interests=interests
-            )
-            db.session.add(profile)
+        file = request.files.get("profile_image")
+        if file and file.filename != "":
+            filename = secure_filename(file.filename)
+            path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            file.save(path)
+            user.profile_image = f"uploads/{filename}"
 
         db.session.commit()
-        return redirect(url_for("dashboard"))
+        flash("Profile updated!")
+        return redirect(url_for("profile"))
 
-    return render_template("profile.html")
+    return render_template("profile.html", user=user)
 
-@app.route("/admin/dashboard")
-def admin_dashboard():
-    if "user_id" not in session or session.get("role") != "admin":
-        return redirect(url_for("login"))
 
-    return render_template(
-        "admin_dashboard.html",
-        user_name=session["user_name"]
-    )
 
 @app.route("/admin/questions", methods=["GET", "POST"])
 def manage_questions():
@@ -330,31 +329,45 @@ def it_test_result():
 
 from flask import session
 
-@app.route('/common_test', methods=['GET', 'POST'])
+@app.route("/common_test", methods=["GET", "POST"])
 def common_test():
-    if "user_id" not in session or session.get("role") != "student":
+    if "user_id" not in session:
         return redirect(url_for("login"))
 
-    # FIRST VISIT → show 10 random ML questions
-    if request.method == "GET":
-        questions = AptitudeQuestion.query.order_by(db.func.random()).limit(10).all()
-        return render_template("branch_test.html", questions=questions, test_type="adaptive")
+    # First question
+    if "current_index" not in session:
+        session["current_index"] = 0
+        session["answers"] = {}
 
-    # FORM SUBMITTED → collect answers
-    answers = request.form.to_dict()
+    # Save previous answer
+    if request.method == "POST":
+        for key, value in request.form.items():
+            session["answers"][key] = value
 
-    # Build feature vector (default neutral = 3)
-    feature_vector = [3] * 60
+        session["current_index"] += 1
 
-    for q_name, value in answers.items():
-        q_id = int(q_name.replace("q", ""))
-        question = AptitudeQuestion.query.get(q_id)
-        if question:
-            feature_vector[question.question_index] = int(value)
+    # If all 60 questions answered → predict
+    all_questions = Question.query.order_by(Question.question_id).all()
 
-    prediction = model.predict([feature_vector])[0]
+    if session["current_index"] >= len(all_questions):
+        prediction = predict_branch(session["answers"])
+        session.clear()
+        return render_template("branch_result.html", prediction=prediction)
 
-    return render_template("branch_result.html", prediction=prediction)
+
+    # Get all questions ordered
+    all_questions = Question.query.order_by(Question.question_id).all()
+
+    # Pick the current question
+    question = all_questions[session["current_index"]]
+
+
+
+    return render_template(
+        "branch_test.html",
+        questions=[question],
+        test_type="adaptive"
+    )
 
 
 
@@ -368,16 +381,20 @@ model = joblib.load(MODEL_PATH)
 
 
 def predict_branch(answer_dict):
-    feature_vector = [3] * 60  # Default neutral answers
+    # Start with neutral values for all 60 questions
+    feature_vector = [3] * 60
 
     for q_name, value in answer_dict.items():
-        q_id = q_name.replace('q', '')
-        question = Question.query.get(q_id)
+        q_id = int(q_name.replace("q", ""))
+        question = AptitudeQuestion.query.get(q_id)
+
 
         if question:
             feature_vector[question.question_index] = int(value)
 
-    return model.predict([feature_vector])[0]
+    prediction = model.predict([feature_vector])[0]
+    return prediction
+
 
 
 if __name__ == "__main__":
